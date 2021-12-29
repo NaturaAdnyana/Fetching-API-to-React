@@ -1,24 +1,29 @@
-import logo from './logo.svg';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import Navbar from './components/Navbar';
 import './App.css';
+import Greeting from './components/Greeting';
+import BookList from './components/BookList';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+    <HelmetProvider>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Anjay</title>
+      </Helmet>
+      <header className='mx-auto bg-gradient-to-r from-blue-500 to-green-400 px-10 py-5'>
+        <Navbar title="Dicoding Books" />
       </header>
-    </div>
+      <main className='p-5'>
+        <div className='container max-w-screen-md border-2 mx-auto p-2 rounded-xl'>
+          <Greeting />
+          <BookList />
+        </div>
+      </main>
+      <footer>
+
+      </footer>
+    </HelmetProvider>
   );
 }
 
