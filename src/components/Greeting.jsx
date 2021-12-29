@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import CloseButton from '../utilities/CloseButton';
 import { saveUser } from '../actions/saveUser';
 import { useEffect } from 'react/cjs/react.development';
-import RenameIcon from '../icons/RenameIcon.jsx';
+import RenameIcon from '../icons/RenameIcon';
+import PaperPlaneIcon from '../icons/PaperPlaneIcon';
 
 const GreetToUser = (props) => {
   const [rename, setRename] = useState();
@@ -40,7 +41,7 @@ const GreetToGuest = (props) => {
       {sayHi ? sayHi :
         <label className='flex justify-center items-center'>
           <span><strong>Hola!</strong> What's your name? </span>
-          <form action="" onSubmit={handleSubmit} className='ml-5 flex'>
+          <form onSubmit={handleSubmit} className='ml-5 flex relative'>
             <input
               autoFocus={true}
               type="text"
@@ -51,8 +52,14 @@ const GreetToGuest = (props) => {
               onChange={(e) => {
                 setUsername(e.target.value)
               }}
+              onFocus={(e) => {
+                e.target.select();
+              }}
               value={username}
             />
+            <button type='submit' className='absolute top-1/2 -translate-y-1/2 right-2'>
+              <PaperPlaneIcon className='w-5 h-5 text-gray-400 rotate-90 hover:text-gray-700' />
+            </button>
           </form>
         </label>
       }
