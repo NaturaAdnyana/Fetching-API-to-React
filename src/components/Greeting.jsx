@@ -12,11 +12,11 @@ const GreetToUser = (props) => {
   }
   return (
     <>
-      {rename ? rename :
+      {rename ??
         <h1 className='flex justify-center items-center'>
-          Welcome back
+          Welcome,
           <b className='ml-1'>{props.sayHi}</b>
-          <button className='ml-1 text-gray-600' onClick={handleRename}>
+          <button className='ml-1 text-gray-600 hover:text-gray-800' onClick={handleRename}>
             <RenameIcon className='w-4 h-4' />
           </button>
         </h1>
@@ -38,9 +38,17 @@ const GreetToGuest = (props) => {
   }, [username]);
   return (
     <>
-      {sayHi ? sayHi :
+      {sayHi ??
         <label className='flex justify-center items-center'>
-          <span><strong>Hola!</strong> What's your name? </span>
+          <span>
+            {username === 'Tony' ?
+              <>
+                Fuck you <b> Tony!</b>
+              </>
+              :
+              "What's your name?"
+            }
+          </span>
           <form onSubmit={handleSubmit} className='ml-5 flex relative'>
             <input
               autoFocus={true}
@@ -56,6 +64,7 @@ const GreetToGuest = (props) => {
                 e.target.select();
               }}
               value={username}
+              required
             />
             <button type='submit' className='absolute top-1/2 -translate-y-1/2 right-2'>
               <PaperPlaneIcon className='w-5 h-5 text-gray-400 rotate-90 hover:text-gray-700' />

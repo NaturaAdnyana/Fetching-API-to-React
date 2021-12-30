@@ -15,7 +15,7 @@ function App() {
         <Navbar title="Dicoding Books" />
       </header>
       <main className='p-5'>
-        <div className='container max-w-screen-md border-2 mx-auto p-2 rounded-xl'>
+        <div className='container max-w-screen-md border-2 mx-auto p-2 rounded-xl text-gray-700'>
           <Greeting />
           <BookList />
         </div>
