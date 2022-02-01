@@ -90,7 +90,7 @@ const Greeting = (props) => {
           <div className=''>
             {getUsername ? <GreetToUser sayHi={getUsername} /> : <GreetToGuest />}
           </div>
-          <CloseButton onClick={() => hideAlert()} />
+          <CloseButton className='active:bg-emerald-300' onClick={() => hideAlert()} />
         </div>
       }
     </>
