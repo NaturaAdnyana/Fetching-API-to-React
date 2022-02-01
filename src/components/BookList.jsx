@@ -62,32 +62,31 @@ const BookList = () => {
     setIsOpen(true);
   }
 
-  const baseUrl = "https://books-api.dicoding.deva";
+  const baseUrl = "https://books-api.dicoding.dev/";
   useEffect(() => {
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-      const responseJson = JSON.parse(this.responseText);
-      if (responseJson.error) {
+    const getBooks = async () => {
+      try {
+        const response = await fetch(`${baseUrl}/list`);
+        const responseJson = await response.json();
+        if (responseJson.error) {
+          setBooksData({
+            warning: responseJson.message,
+            value: "",
+          });
+        } else {
+          setBooksData({
+            warning: "",
+            value: responseJson.books,
+          });
+        }
+      } catch (error) {
         setBooksData({
-          warning: responseJson.message,
-          value: null,
-        });
-      } else {
-        const data = responseJson.books;
-        setBooksData({
-          warning: null,
-          value: data,
+          warning: error,
+          value: "",
         });
       }
     };
-    xhr.onerror = function () {
-      setBooksData({
-        warning: "Whoops! something went wrong ⚠",
-        value: null,
-      });
-    };
-    xhr.open("GET", `${baseUrl}/list`);
-    xhr.send();
+    getBooks();
   }, []);
 
   const handleSubmit = (e) => {};
@@ -224,8 +223,9 @@ const BookList = () => {
                       />
                     </div>
                     <div>
-                      <label htmlFor="">Author</label>
+                      <label htmlFor="author">Author</label>
                       <input
+                        id="author"
                         type="text"
                         onChange={(e) => {
                           setBookAuthor(e.target.value);
