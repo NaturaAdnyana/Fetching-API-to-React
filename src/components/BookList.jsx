@@ -5,6 +5,12 @@ import DeleteIcon from "../icons/DeleteIcon";
 import EditIcon from "../icons/EditIcon";
 import PlusIcon from "../icons/PlusIcon";
 import CloseButton from "../utilities/CloseButton";
+import {
+  getBooks,
+  insertBook,
+  updateBook,
+  removeBook,
+} from "../actions/dicodingBook";
 
 const RenderingBooks = (props) => {
   const elements = [1, 2, 3];
@@ -33,15 +39,21 @@ const RenderingBooks = (props) => {
 
 const BookList = () => {
   const [booksData, setBooksData] = useState({
-    warning: "",
+    message: "",
+    value: "",
+  });
+  const [isRequestComplete, setIsRequestComplete] = useState({
+    message: "",
     value: "",
   });
   const [isOpen, setIsOpen] = useState(false);
   const [isInsert, setIsInsert] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
   const [bookID, setBookID] = useState();
   const [bookTitle, setBookTitle] = useState();
   const [bookAuthor, setBookAuthor] = useState();
+  const [removeMessage, setRemoveMessage] = useState(true);
 
   function closeModal() {
     setIsOpen(false);
@@ -54,6 +66,7 @@ const BookList = () => {
 
   function openAddModal() {
     setIsInsert(true);
+    setBookID(value.length + 1);
     setIsOpen(true);
   }
 
@@ -62,41 +75,108 @@ const BookList = () => {
     setIsOpen(true);
   }
 
-  const baseUrl = "https://books-api.dicoding.dev/";
-  useEffect(() => {
-    const getBooks = async () => {
-      try {
-        const response = await fetch(`${baseUrl}/list`);
-        const responseJson = await response.json();
-        if (responseJson.error) {
-          setBooksData({
-            warning: responseJson.message,
-            value: "",
-          });
-        } else {
-          setBooksData({
-            warning: "",
-            value: responseJson.books,
-          });
-        }
-      } catch (error) {
+  function requestGetBooks() {
+    getBooks()
+      .then((result) => {
         setBooksData({
-          warning: error,
+          message: result.message,
+          value: result.value,
+        });
+      })
+      .finally(console.log("Get Fetch Finished"))
+      .catch((err) => {
+        setBooksData({
+          message: err.message,
           value: "",
         });
-      }
-    };
-    getBooks();
+        console.table(err);
+      });
+  }
+
+  function requestDeleteBook(bookID) {
+    setIsDelete(true);
+    removeBook(bookID)
+      .then((result) => {
+        setIsRequestComplete({
+          message: result.message,
+          value: "",
+        });
+      })
+      .then(requestGetBooks)
+      .finally(() => {
+        setIsDelete(true);
+      });
+    setRemoveMessage(false);
+  }
+
+  useEffect(() => {
+    requestGetBooks();
   }, []);
 
-  const handleSubmit = (e) => {};
-  const { warning, value } = booksData;
+  const handleSubmit = (e) => {
+    if (isInsert) {
+      insertBook(bookID, bookTitle, bookAuthor)
+        .then((result) => {
+          setIsRequestComplete({
+            message: result.message,
+            value: result.value,
+          });
+        })
+        .then(requestGetBooks);
+      e.preventDefault();
+      closeModal();
+    }
+    if (isEdit) {
+      updateBook(bookID, bookTitle, bookAuthor)
+        .then((result) => {
+          setIsRequestComplete({
+            message: result.message,
+            value: result.value,
+          });
+        })
+        .then(requestGetBooks);
+      e.preventDefault();
+      closeModal();
+    }
+    setRemoveMessage(false);
+  };
+
+  function hideMessage() {
+    setRemoveMessage(true);
+    isDelete && setIsDelete(false);
+  }
+
+  if (isDelete) {
+    setTimeout(hideMessage, 5000);
+  }
+
+  const { message, value } = booksData;
 
   return (
     <>
+      {!removeMessage && (
+        <div className="bg-emerald-200 py-2 px-5 pr-2 rounded-lg flex justify-between items-center mb-2">
+          <div className="">
+            <span>
+              {isRequestComplete.message}
+              {!isDelete && (
+                <span>
+                  ID : {isRequestComplete.value.id}, judul :
+                  {isRequestComplete.value.title}, author :
+                  {isRequestComplete.value.author}
+                </span>
+              )}
+            </span>
+          </div>
+          <CloseButton
+            className="active:bg-emerald-300"
+            onClick={() => hideMessage()}
+          />
+        </div>
+      )}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 auto-cols-fr">
         {!value ? (
-          <RenderingBooks warning={warning} />
+          <RenderingBooks warning={message} />
         ) : (
           value.map((book, key) => (
             <div className="p-3 rounded-md bg-blue-200" key={book.id}>
@@ -118,7 +198,12 @@ const BookList = () => {
                 >
                   <EditIcon className="w-4 h-4" />
                 </button>
-                <button className="bg-red-400 rounded-full hover:bg-red-500 p-3 active:animate-spin">
+                <button
+                  className="bg-red-400 rounded-full hover:bg-red-500 p-3 active:animate-spin"
+                  onClick={() => {
+                    requestDeleteBook(book.id);
+                  }}
+                >
                   <DeleteIcon className="w-4 h-4" />
                 </button>
               </div>
@@ -187,10 +272,10 @@ const BookList = () => {
                 </Dialog.Title>
                 <div
                   className={`transition w-full bg-red-300 py-3 text-center ${
-                    warning ? "translate-y-0" : "-translate-y-32"
+                    message ? "translate-y-0" : "-translate-y-32"
                   }`}
                 >
-                  {warning}
+                  {message}
                 </div>
                 <div className="mt-2 py-2 px-6">
                   <form className="space-y-3 pb-3" onSubmit={handleSubmit}>
